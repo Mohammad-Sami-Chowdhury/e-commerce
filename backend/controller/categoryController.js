@@ -48,4 +48,34 @@ async function getSingleCategoryController(req, res) {
     data: getSingleCategory,
   });
 }
-module.exports = { categoryControler, getAllCategoryController, getSingleCategoryController };
+
+async function updateCategoryController(req, res) {
+  const { id } = req.params;
+  const { name, description } = req.body;
+  const updatedCategory = await categorySchema.findByIdAndUpdate(
+    id,
+    { name, description },
+    { new: true }
+  );
+  res.status(200).json({
+    message: "Category updated successfully",
+    status: "Success",
+    data: updatedCategory,
+  });
+}
+
+async function deleteCategory(req, res) {
+  const { id } = req.params;
+  await categorySchema.findByIdAndDelete(id);
+  res.status(200).json({
+    message: "Category deleted successfully",
+    status: "Success",
+  });
+}
+module.exports = {
+  categoryControler,
+  getAllCategoryController,
+  getSingleCategoryController,
+  updateCategoryController,
+  deleteCategory,
+};

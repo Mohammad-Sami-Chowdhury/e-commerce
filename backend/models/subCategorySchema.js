@@ -14,5 +14,11 @@ const subCategorySchema = new Schema({
     ref: "Category",
     required: true,
   },
+  products: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Product",
+    },
+  ],
 });
 module.exports = mongoose.model("SubCategory", subCategorySchema);
