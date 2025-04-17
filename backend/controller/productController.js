@@ -2,6 +2,7 @@ const productSchema = require("../models/productSchema");
 const categorySchema = require("../models/categorySchema");
 const subCategorySchema = require("../models/subCategorySchema");
 const { get } = require("mongoose");
+const uploadResult = require("../middleware/cloudinary");
 
 async function createProductController(req, res) {
   try {
@@ -10,10 +11,12 @@ async function createProductController(req, res) {
       description,
       price,
       discountPrice,
-      productImg,
       categoryName,
       subCategoryName,
     } = req.body;
+    const fileName = req.file.path;
+    const imgUrl = await uploadResult(fileName);
+
     const existingProduct = await productSchema.findOne({ name });
     if (existingProduct) {
       return res.status(400).json({
@@ -37,7 +40,7 @@ async function createProductController(req, res) {
       description,
       price,
       discountPrice,
-      productImg,
+      productImg: imgUrl.secure_url,
       category: category._id,
       subCategory: subCategory._id,
     });
@@ -64,14 +67,16 @@ async function createProductController(req, res) {
       status: "Error",
       error: error.message,
     });
+    console.log(error);
   }
 }
 
 async function getAllProductController(req, res) {
   try {
-    const allProducts = await productSchema.find({});
-    // .populate("category")
-    // .populate("subCategory");
+    const allProducts = await productSchema
+      .find({})
+      .populate("category")
+      .populate("subCategory");
     res.status(200).json({
       message: "All products fetched successfully",
       status: "Success",

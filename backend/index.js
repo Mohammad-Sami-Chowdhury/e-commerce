@@ -23,6 +23,8 @@ app.use(
   })
 );
 app.use(route);
+const path = require("path");
+app.use("/upload", express.static(path.join(__dirname, "upload")));
 
 app.listen(port, (req, res) => {
   console.log("Back-end is running");

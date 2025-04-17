@@ -20,7 +20,15 @@ const productSchema = new Schema({
   },
   productImg: {
     type: String,
-    required: true,
+  },
+  ram: {
+    type: String,
+  },
+  storage: {
+    type: String,
+  },
+  color: {
+    type: String,
   },
   category: {
     type: Schema.Types.ObjectId,

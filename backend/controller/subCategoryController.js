@@ -102,8 +102,9 @@ async function deleteSubCategoryController(req, res) {
 
 async function getAllSubCategoryController(req, res) {
   try {
-    const allSubCategories = await subCategorySchema.find({});
-    // .populate("category");
+    const allSubCategories = await subCategorySchema
+      .find({})
+      .populate("category");
     res.status(200).json({
       message: "All subcategories fetched successfully",
       status: "Success",
@@ -123,7 +124,7 @@ async function getSingleSubCategoryController(req, res) {
     const { id } = req.params;
     const subCategory = await subCategorySchema
       .findById(id)
-      // .populate("category");
+      .populate("category");
     if (!subCategory) {
       return res.status(404).json({
         message: "SubCategory not found",
@@ -149,5 +150,5 @@ module.exports = {
   updateSubCategoryController,
   deleteSubCategoryController,
   getAllSubCategoryController,
-  getSingleSubCategoryController
+  getSingleSubCategoryController,
 };
