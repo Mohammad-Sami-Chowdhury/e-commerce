@@ -67,7 +67,6 @@ async function createProductController(req, res) {
       status: "Error",
       error: error.message,
     });
-    console.log(error);
   }
 }
 
