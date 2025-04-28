@@ -1,5 +1,6 @@
 require("dotenv").config();
 const express = require("express");
+var cors = require('cors')
 const database = require("./database/database");
 const route = require("./route");
 const session = require("express-session");
@@ -9,6 +10,7 @@ const app = express();
 const port = 5000;
 database();
 app.use(express.json());
+app.use(cors())
 const store = new MongoDBStore({
   uri: process.env.DATABASE_URL,
   collection: "mySessions",

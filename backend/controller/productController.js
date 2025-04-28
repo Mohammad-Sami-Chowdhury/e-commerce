@@ -13,6 +13,10 @@ async function createProductController(req, res) {
       discountPrice,
       categoryName,
       subCategoryName,
+      ram,
+      storage,
+      color,
+      stock,
     } = req.body;
     const fileName = req.file.path;
     const imgUrl = await uploadResult(fileName);
@@ -43,6 +47,10 @@ async function createProductController(req, res) {
       productImg: imgUrl.secure_url,
       category: category._id,
       subCategory: subCategory._id,
+      ram,
+      storage,
+      color,
+      stock,
     });
     const savedProduct = await product.save();
 
@@ -102,7 +110,7 @@ async function getSingleProductController(req, res) {
 
 async function updateProductController(req, res) {
   const { id } = req.params;
-  const { name, description, price, discountPrice, productImg } = req.body;
+  const { name, description, price, discountPrice, productImg, ram, storage, color, stock } = req.body;
   const updatedProduct = await productSchema.findByIdAndUpdate(
     id,
     { name, description, price, discountPrice, productImg },

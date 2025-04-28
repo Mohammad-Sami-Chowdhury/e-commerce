@@ -5,7 +5,8 @@ async function subCategoryController(req, res) {
   try {
     const { name, description, category } = req.body;
 
-    const parentCategory = await categorySchema.findOne({ name: category });
+    // Find the parent category by its ID
+    const parentCategory = await categorySchema.findById(category);
     if (!parentCategory) {
       return res.status(404).json({
         message: "Parent category not found",
@@ -13,14 +14,16 @@ async function subCategoryController(req, res) {
       });
     }
 
+    // Create the subcategory
     const subCategory = new subCategorySchema({
       name,
       description,
-      category: parentCategory._id,
+      category: parentCategory._id, // Link the subcategory to the parent category
     });
 
     const savedSubCategory = await subCategory.save();
 
+    // Add the subcategory to the parent category's subCategory array
     parentCategory.subCategory.push(savedSubCategory._id);
     await parentCategory.save();
 

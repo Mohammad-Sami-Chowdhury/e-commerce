@@ -7,6 +7,7 @@ import {
   ShoppingCart,
   TrendingUp,
   Users,
+  ChartBarStacked
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -20,6 +21,7 @@ const SIDEBAR_ITEMS = [
     href: "/",
   },
   { name: "Products", icon: ShoppingBag, color: "#8B5CF6", href: "/products" },
+  { name: "Category", icon: ChartBarStacked, color: "#8B5CF6", href: "/categories" },
   { name: "Users", icon: Users, color: "#EC4899", href: "/users" },
   { name: "Sales", icon: DollarSign, color: "#10B981", href: "/sales" },
   { name: "Orders", icon: ShoppingCart, color: "#F59E0B", href: "/orders" },

@@ -30,6 +30,10 @@ const productSchema = new Schema({
   color: {
     type: String,
   },
+  stock: {
+    type: Number,
+    required: true,
+  },
   category: {
     type: Schema.Types.ObjectId,
     ref: "Category",
