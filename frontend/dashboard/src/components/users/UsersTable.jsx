@@ -21,19 +21,34 @@ const UsersTable = () => {
           "http://localhost:5000/api/v1/users/getallusers"
         );
 
-        console.log("API Response:", data); // Log the API response
+        console.log("Full API Response:", data);
 
-        const usersArray = Array.isArray(data.data) ? data.data : [];
-        setUsers(usersArray); // Store users in state
-        setFilteredUsers(usersArray); // Initialize filtered users
-        console.log("Users Array:", usersArray); // Log the processed users array
+        const receivedData = data.data || data;
+
+        if (!Array.isArray(receivedData)) {
+          throw new Error("Invalid data format received from server");
+        }
+        const usersArray = receivedData.map((user) => ({
+          _id: user._id,
+          name: user.firstName || "No Name",
+          email: user.email || "No Email",
+          role: user.role || "user",
+          status: user.status || "active",
+        }));
+
+        setUsers(usersArray);
+        setFilteredUsers(usersArray);
       } catch (err) {
-        console.error("Error fetching users:", err); // Log the error
-        setError(err.response?.data?.message || "Failed to fetch users");
+        console.error("Error details:", err);
+        setError(err.message || "Failed to fetch users");
+        if (!err.response) {
+          setError("Network error - Please check your internet connection");
+        }
       } finally {
         setLoading(false);
       }
     };
+
     fetchUsers();
   }, []);
 
@@ -53,7 +68,9 @@ const UsersTable = () => {
   // Handle delete user
   const handleDeleteUser = async (userId) => {
     try {
-      await axios.delete(`http://localhost:5000/api/v1/users/deleteuser/${userId}`);
+      await axios.delete(
+        `http://localhost:5000/api/v1/users/deleteuser/${userId}`
+      );
       setUsers(users.filter((user) => user._id !== userId));
       setFilteredUsers(filteredUsers.filter((user) => user._id !== userId));
       alert("User deleted successfully!");
@@ -71,7 +88,7 @@ const UsersTable = () => {
   // Save updated role
   const handleSaveRole = async () => {
     try {
-      await axios.put("http://localhost:5000/api/v1/users/updateuserrole", {
+      await axios.patch("http://localhost:5000/api/v1/users/updateuserrole", {
         userId: editingUser._id,
         role: newRole,
       });

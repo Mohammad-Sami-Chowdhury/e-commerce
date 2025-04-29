@@ -1,5 +1,5 @@
 const express = require("express");
-const registrationController = require("../../controller/registrationController");
+const {registrationController} = require("../../controller/registrationController");
 const otpController = require("../../controller/otpController");
 const {
   loginController,
