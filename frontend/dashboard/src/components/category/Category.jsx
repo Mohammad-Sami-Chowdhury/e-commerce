@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import toast, { Toaster } from "react-hot-toast";
 import { Trash2, Plus, Edit } from "lucide-react";
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -57,6 +58,7 @@ const CategoryPage = () => {
             cat._id === category._id ? data.data || data : cat
           )
         );
+        toast.success("Category updated successfully!");
       } else {
         // Add category
         const { data } = await axios.post(
@@ -67,8 +69,10 @@ const CategoryPage = () => {
       }
       setShowCategoryModal(false);
       setEditingCategory(null);
+      toast.success("Category created successfully!");
     } catch (err) {
       setError(err.response?.data?.message || "Failed to save category");
+      toast.error("There was a problem!");
     }
   };
 
@@ -86,6 +90,7 @@ const CategoryPage = () => {
             sub._id === subCategory._id ? data.data || data : sub
           )
         );
+        toast.success("Subcategory updated successfully!");
       } else {
         // Add subcategory
         const { data } = await axios.post(
@@ -96,8 +101,10 @@ const CategoryPage = () => {
       }
       setShowSubCategoryModal(false);
       setEditingSubCategory(null);
+      toast.success("Subcategory updated successfully!");
     } catch (err) {
       setError(err.response?.data?.message || "Failed to save subcategory");
+      toast.error("There was a problem!");
     }
   };
 
@@ -108,8 +115,10 @@ const CategoryPage = () => {
         `http://localhost:5000/api/v1/category/deletecategory/${categoryId}`
       );
       setCategories(categories.filter((cat) => cat._id !== categoryId));
+      toast.success("Category deleted successfully!");
     } catch (err) {
       setError(err.response?.data?.message || "Failed to delete category");
+      toast.error("There was a problem!");
     }
   };
 
@@ -122,8 +131,10 @@ const CategoryPage = () => {
       setSubCategories(
         subCategories.filter((sub) => sub._id !== subCategoryId)
       );
+      toast.success("Subcategory deleted successfully!");
     } catch (err) {
       setError(err.response?.data?.message || "Failed to delete subcategory");
+      toast.error("There was a problem!");
     }
   };
 
@@ -154,6 +165,7 @@ const CategoryPage = () => {
 
   return (
     <div className="p-6 bg-gray-900 text-gray-100 rounded-lg">
+      <Toaster />
       {/* Categories Section */}
       <div className="mb-8">
         <div className="flex justify-between items-center mb-6">

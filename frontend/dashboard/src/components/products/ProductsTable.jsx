@@ -76,6 +76,43 @@ const ProductsTable = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Product Add
+  const handleAddProduct = async () => {
+    try {
+      await axios.post("http://localhost:5000/api/v1/product/createproduct", {
+        ...formData,
+        price: Number(formData.price),
+        discountPrice: Number(formData.discountPrice),
+        stock: Number(formData.stock),
+      });
+
+      // Refresh data
+      const { data } = await axios.get(
+        "http://localhost:5000/api/v1/product/getallproduct"
+      );
+      setProducts(data.data || data);
+      setFilteredProducts(data.data || data);
+
+      setFormData({
+        name: "",
+        description: "",
+        price: "",
+        discountPrice: "",
+        productImg: "",
+        category: "",
+        subCategory: "",
+        color: "",
+        ram: "",
+        storage: "",
+        stock: "",
+      });
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to add product");
+    } finally {
+      setShowAddModal(false);
+    }
+  };
+
   // Search functionality
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
@@ -93,11 +130,25 @@ const ProductsTable = () => {
 
   // Form input change
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    if (editingProduct) {
-      setEditingProduct({ ...editingProduct, [name]: value });
+    const { name, value, files } = e.target;
+
+    if (name === "productImg" && files && files[0]) {
+      const file = files[0];
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          productImg: reader.result, // Set the preview URL
+        }));
+      };
+
+      reader.readAsDataURL(file); // Read the file as a data URL
     } else {
-      setFormData({ ...formData, [name]: value });
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        [name]: value,
+      }));
     }
   };
 
@@ -116,96 +167,6 @@ const ProductsTable = () => {
         category: categoryId,
         subCategory: "", // Reset subcategory when category changes
       });
-    }
-  };
-
-  // Image upload
-  // ProductsTable.jsx-এ handleImageUpload ফাংশন
-  const handleImageUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    try {
-      const uploadFormData = new FormData();
-      uploadFormData.append("productImg", file); // মাল্টারের সাথে ম্যাচ করতে
-
-      const { data } = await axios.post(
-        "http://localhost:5000/api/v1/product/createproduct",
-        uploadFormData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-
-      // ইমেজ URL সেট করুন
-      const imageUrl = data.data.productImg;
-      if (editingProduct) {
-        setEditingProduct({ ...editingProduct, productImg: imageUrl });
-      } else {
-        setFormData({ ...formData, productImg: imageUrl });
-      }
-    } catch (err) {
-      console.error("Image upload error:", err);
-      setError(err.response?.data?.message || "Image upload failed");
-    }
-  };
-
-  // Remove image
-  const handleRemoveImage = () => {
-    if (editingProduct) {
-      setEditingProduct({ ...editingProduct, productImg: "" });
-    } else {
-      setFormData({ ...formData, productImg: "" });
-    }
-  };
-
-  // Add product
-  // handleAddProduct ফাংশন আপডেট করুন
-  const handleAddProduct = async () => {
-    try {
-      // ভেরিফিকেশন যোগ করুন
-      if (
-        !formData.name ||
-        !formData.price ||
-        !formData.category ||
-        !formData.stock
-      ) {
-        throw new Error("Required fields are missing");
-      }
-
-      const payload = {
-        ...formData,
-        price: Number(formData.price),
-        discountPrice: Number(formData.discountPrice) || 0,
-        stock: Number(formData.stock),
-        category: formData.category, // ID হিসেবে পাঠানো হচ্ছে
-        subCategory: formData.subCategory || null, // ID হিসেবে পাঠানো হচ্ছে
-      };
-
-      const { data } = await axios.post(
-        "http://localhost:5000/api/v1/product/createproduct",
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-
-      // স্টেট আপডেট করুন
-      setProducts([...products, data.data]);
-      setFilteredProducts([...products, data.data]);
-
-      setShowAddModal(false);
-      setFormData({ ...formData }); // রিসেট ফর্ম
-    } catch (err) {
-      console.error("Product creation error:", err);
-      setError(
-        err.response?.data?.message || err.message || "Failed to create product"
-      );
     }
   };
 
@@ -654,7 +615,12 @@ const ProductsTable = () => {
                       }}
                     />
                     <button
-                      onClick={handleRemoveImage}
+                      onClick={() =>
+                        setFormData((prevFormData) => ({
+                          ...prevFormData,
+                          productImg: "",
+                        }))
+                      }
                       className="absolute top-0 right-0 bg-red-500 text-white rounded-full size-5 flex items-center justify-center"
                     >
                       ×
@@ -670,9 +636,10 @@ const ProductsTable = () => {
                   </div>
                   <input
                     type="file"
-                    className="hidden"
+                    name="productImg"
                     accept="image/*"
-                    onChange={handleImageUpload}
+                    onChange={handleInputChange}
+                    className="hidden"
                   />
                 </label>
               </div>
@@ -901,8 +868,14 @@ const ProductsTable = () => {
 
               {/* Image Upload */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">
-                  Product Image
+                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-600 border-dashed rounded-lg cursor-pointer bg-gray-700 hover:bg-gray-600">
+                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                    <Plus className="text-gray-400 mb-2" size={24} />
+                    <p className="text-sm text-gray-400">
+                      {formData.productImg ? "Change image" : "Upload image"}
+                    </p>
+                  </div>
+                  <input type="file" className="hidden" accept="image/*" />
                 </label>
                 {editingProduct.productImg && (
                   <div className="relative mb-4">
@@ -916,29 +889,25 @@ const ProductsTable = () => {
                       }}
                     />
                     <button
-                      onClick={handleRemoveImage}
+                      onClick={() =>
+                        setEditingProduct((prevEditingProduct) => ({
+                          ...prevEditingProduct,
+                          productImg: "",
+                        }))
+                      }
                       className="absolute top-0 right-0 bg-red-500 text-white rounded-full size-5 flex items-center justify-center"
                     >
                       ×
                     </button>
                   </div>
                 )}
-                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-600 border-dashed rounded-lg cursor-pointer bg-gray-700 hover:bg-gray-600">
-                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                    <Plus className="text-gray-400 mb-2" size={24} />
-                    <p className="text-sm text-gray-400">
-                      {editingProduct.productImg
-                        ? "Change image"
-                        : "Upload image"}
-                    </p>
-                  </div>
-                  <input
-                    type="file"
-                    className="hidden"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                  />
-                </label>
+                <input
+                  type="file"
+                  name="productImg"
+                  accept="image/*"
+                  onChange={handleInputChange}
+                  className="w-full bg-gray-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
               </div>
             </div>
 
