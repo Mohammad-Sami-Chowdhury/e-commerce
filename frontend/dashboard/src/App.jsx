@@ -10,6 +10,7 @@ import SalesPage from "./pages/SalesPage";
 import OrdersPage from "./pages/OrdersPage";
 import AnalyticsPage from "./pages/AnalyticsPage";
 import SettingsPage from "./pages/SettingsPage";
+import CreateProduct from "./components/products/createProduct";
 
 function App() {
 	return (
@@ -24,6 +25,7 @@ function App() {
 			<Routes>
 				<Route path='/' element={<OverviewPage />} />
 				<Route path='/products' element={<ProductsPage />} />
+				<Route path='/create-product' element={<CreateProduct/>} />
 				<Route path='/categories' element={<CategoryPage />} />
 				<Route path='/users' element={<UsersPage />} />
 				<Route path='/sales' element={<SalesPage />} />

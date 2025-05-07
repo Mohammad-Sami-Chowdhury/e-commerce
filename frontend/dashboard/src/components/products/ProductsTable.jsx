@@ -12,12 +12,12 @@ const ProductsTable = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
-  const [showAddModal, setShowAddModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
 
   // Category states
   const [categories, setCategories] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
+
   // Form state
   const [formData, setFormData] = useState({
     name: "",
@@ -75,43 +75,6 @@ const ProductsTable = () => {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-
-  // Product Add
-  const handleAddProduct = async () => {
-    try {
-      await axios.post("http://localhost:5000/api/v1/product/createproduct", {
-        ...formData,
-        price: Number(formData.price),
-        discountPrice: Number(formData.discountPrice),
-        stock: Number(formData.stock),
-      });
-
-      // Refresh data
-      const { data } = await axios.get(
-        "http://localhost:5000/api/v1/product/getallproduct"
-      );
-      setProducts(data.data || data);
-      setFilteredProducts(data.data || data);
-
-      setFormData({
-        name: "",
-        description: "",
-        price: "",
-        discountPrice: "",
-        productImg: "",
-        category: "",
-        subCategory: "",
-        color: "",
-        ram: "",
-        storage: "",
-        stock: "",
-      });
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to add product");
-    } finally {
-      setShowAddModal(false);
-    }
-  };
 
   // Search functionality
   const handleSearch = (e) => {
@@ -258,22 +221,6 @@ const ProductsTable = () => {
     );
   }
 
-  // Empty state
-  if (!products.length) {
-    return (
-      <div className="bg-gray-800 bg-opacity-50 text-gray-300 p-8 text-center rounded-lg">
-        <h3 className="text-xl font-semibold mb-2">No Products Found</h3>
-        <button
-          onClick={() => setShowAddModal(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 mx-auto"
-        >
-          <Plus size={18} />
-          <span>Add Product</span>
-        </button>
-      </div>
-    );
-  }
-
   return (
     <div className="relative">
       {/* Product Table */}
@@ -320,7 +267,7 @@ const ProductsTable = () => {
             )}
 
             <button
-              onClick={() => setShowAddModal(true)}
+              // onClick={() => setShowAddModal(true)}
               className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg md:rounded-full md:px-4 md:flex md:items-center md:gap-2"
             >
               <Plus size={18} />
@@ -405,263 +352,6 @@ const ProductsTable = () => {
           </table>
         </div>
       </motion.div>
-
-      {/* Add Product Modal */}
-      {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
-          <motion.div
-            className="bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-          >
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-semibold text-gray-100">
-                Add Product
-              </h3>
-              <button
-                onClick={() => setShowAddModal(false)}
-                className="text-gray-400 hover:text-gray-200"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              {/* Product Information */}
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">
-                  Name*
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  className="w-full bg-gray-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">
-                  Description*
-                </label>
-                <textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleInputChange}
-                  className="w-full bg-gray-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  rows={3}
-                  required
-                />
-              </div>
-
-              {/* Pricing */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    Price*
-                  </label>
-                  <input
-                    type="number"
-                    name="price"
-                    value={formData.price}
-                    onChange={handleInputChange}
-                    className="w-full bg-gray-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    min="0"
-                    step="0.01"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    Discount Price
-                  </label>
-                  <input
-                    type="number"
-                    name="discountPrice"
-                    value={formData.discountPrice}
-                    onChange={handleInputChange}
-                    className="w-full bg-gray-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    min="0"
-                    step="0.01"
-                  />
-                </div>
-              </div>
-
-              {/* Category Selection */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <div className="flex justify-between items-center mb-1">
-                    <label className="block text-sm font-medium text-gray-300">
-                      Category*
-                    </label>
-                  </div>
-                  <select
-                    name="category"
-                    value={formData.category}
-                    onChange={handleCategoryChange}
-                    className="w-full bg-gray-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                  >
-                    <option value="">Select Category</option>
-                    {categories.map((cat) => (
-                      <option key={cat._id} value={cat._id}>
-                        {cat.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <div className="flex justify-between items-center mb-1">
-                    <label className="block text-sm font-medium text-gray-300">
-                      Subcategory
-                    </label>
-                  </div>
-                  <select
-                    name="subCategory"
-                    value={formData.subCategory}
-                    onChange={handleInputChange}
-                    className="w-full bg-gray-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    disabled={!formData.category}
-                  >
-                    <option value="">Select Subcategory</option>
-                    {subCategories
-                      .filter(
-                        (sub) =>
-                          sub.category === formData.category ||
-                          sub.category._id === formData.category
-                      )
-                      .map((sub) => (
-                        <option key={sub._id} value={sub._id}>
-                          {sub.name}
-                        </option>
-                      ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* Specifications */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    Color
-                  </label>
-                  <input
-                    type="text"
-                    name="color"
-                    value={formData.color}
-                    onChange={handleInputChange}
-                    className="w-full bg-gray-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    RAM
-                  </label>
-                  <input
-                    type="text"
-                    name="ram"
-                    value={formData.ram}
-                    onChange={handleInputChange}
-                    className="w-full bg-gray-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    Storage
-                  </label>
-                  <input
-                    type="text"
-                    name="storage"
-                    value={formData.storage}
-                    onChange={handleInputChange}
-                    className="w-full bg-gray-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    Stock*
-                  </label>
-                  <input
-                    type="number"
-                    name="stock"
-                    value={formData.stock}
-                    onChange={handleInputChange}
-                    className="w-full bg-gray-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    min="0"
-                    required
-                  />
-                </div>
-              </div>
-
-              {/* Image Upload */}
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">
-                  Product Image
-                </label>
-                {formData.productImg && (
-                  <div className="relative mb-4">
-                    <img
-                      src={formData.productImg}
-                      alt="Preview"
-                      className="size-16 object-cover rounded"
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = "https://via.placeholder.com/64";
-                      }}
-                    />
-                    <button
-                      onClick={() =>
-                        setFormData((prevFormData) => ({
-                          ...prevFormData,
-                          productImg: "",
-                        }))
-                      }
-                      className="absolute top-0 right-0 bg-red-500 text-white rounded-full size-5 flex items-center justify-center"
-                    >
-                      ×
-                    </button>
-                  </div>
-                )}
-                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-600 border-dashed rounded-lg cursor-pointer bg-gray-700 hover:bg-gray-600">
-                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                    <Plus className="text-gray-400 mb-2" size={24} />
-                    <p className="text-sm text-gray-400">
-                      {formData.productImg ? "Change image" : "Upload image"}
-                    </p>
-                  </div>
-                  <input
-                    type="file"
-                    name="productImg"
-                    accept="image/*"
-                    onChange={handleInputChange}
-                    className="hidden"
-                  />
-                </label>
-              </div>
-            </div>
-
-            <div className="mt-6 flex justify-end gap-3">
-              <button
-                onClick={() => setShowAddModal(false)}
-                className="px-4 py-2 text-gray-300 hover:text-white rounded-lg"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleAddProduct}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg disabled:opacity-50"
-              >
-                Add Product
-              </button>
-            </div>
-          </motion.div>
-        </div>
-      )}
 
       {/* Edit Product Modal */}
       {editingProduct && (
