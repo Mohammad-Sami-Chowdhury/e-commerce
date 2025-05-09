@@ -18,8 +18,8 @@ async function createProductController(req, res) {
       color,
       stock,
     } = req.body;
-    const fileName = req.file.path;
-    const imgUrl = await uploadResult(fileName);
+    // const fileName = req.file.path;
+    // const imgUrl = await uploadResult(fileName);
 
     const existingProduct = await productSchema.findOne({ name });
     if (existingProduct) {
@@ -44,7 +44,7 @@ async function createProductController(req, res) {
       description,
       price,
       discountPrice,
-      productImg: imgUrl.secure_url,
+      // productImg: imgUrl.secure_url,
       category: category._id,
       subCategory: subCategory._id,
       ram,

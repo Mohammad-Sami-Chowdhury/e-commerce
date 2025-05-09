@@ -1,77 +1,68 @@
 import { motion } from "framer-motion";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 
 const CreateProduct = () => {
   const [allCategory, setAllcategory] = useState([]);
   const [allSubCategory, setAllSubcategory] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedSubCategory, setSelectedSubCategory] = useState("");
-
   useEffect(() => {
     axios
       .get("http://localhost:5000/api/v1/category/getallcategory")
       .then((res) => {
-        console.log("Category Response:", res.data.data);
-        const categories = res.data.data;
-        setAllcategory(categories);
-        // Set the first category as selected if available
-        if (categories.length > 0) {
-          setSelectedCategory(categories[0].name);
-        }
+        setAllcategory(res.data.data || []); // Ensure it's an array
+      })
+      .catch((err) => {
+        console.error("Error fetching categories:", err);
       });
 
     axios
-      .get("http://localhost:5000/api/v1/subCategory/getallsubcategory")
+      .get("http://localhost:5000/api/v1/subcategory/getallsubcategory")
       .then((res) => {
-        console.log("SubCategory Response:", res.data.data);
-        const subCategories = res.data.data;
-        setAllSubcategory(subCategories);
-        // Set the first subcategory as selected if available
-        if (subCategories.length > 0) {
-          setSelectedSubCategory(subCategories[0].name);
-        }
+        // Debug the response
+        setAllSubcategory(res.data.data || []); // Ensure it's an array
+      })
+      .catch((err) => {
+        console.error("Error fetching subcategories:", err);
       });
   }, []);
 
   const handleCreateProduct = async (e) => {
     e.preventDefault();
-    const category = allCategory.find(
-      (category) => category.name === selectedCategory
+    const categoryId = allCategory.find(
+      (category) => category.name == selectedCategory
     );
-    const subCategory = allSubCategory.find(
-      (subcategory) => subcategory.name === selectedSubCategory
+    const subCategoryId = allSubCategory.find(
+      (subcategory) => subcategory.name == selectedSubCategory
     );
-
-    // Check if category or subcategory is not found
-    if (!category || !subCategory) {
-      console.error("Category or SubCategory not found");
-      return;
-    }
 
     const formData = new FormData();
+
     formData.append("name", e.target.name.value);
     formData.append("description", e.target.description.value);
     formData.append("price", e.target.price.value);
-    formData.append("color", e.target.color.value);
-    formData.append("stock", e.target.stock.value);
+    formData.append("discount", e.target.discount.value);
     formData.append("ram", e.target.ram.value);
     formData.append("storage", e.target.storage.value);
-    formData.append("discountPrice", e.target.discountPrice.value);
-    formData.append("category", category._id);
-    formData.append("subCategory", subCategory._id);
-
-    if (e.target.image.files[0]) {
-      formData.append("image", e.target.image.files[0]);
-    }
+    formData.append("color", e.target.color.value);
+    formData.append("stock", e.target.stock.value);
+    formData.append("category", categoryId._id);
+    formData.append("subCategory", subCategoryId._id);
+    console.log(categoryId._id, subCategoryId._id);
+    console.log(formData.append("name", e.target.name.value));
+    
+    // if (e.target.image.files[0]) {
+    //   formData.append("image", e.target.image.files[0]);
+    // }
 
     try {
       const res = await axios.post(
         "http://localhost:5000/api/v1/product/createproduct",
-        formData,
+        console.log(formData), 
         {
           headers: {
-            "Content-Type": "multipart/form-data",
+            "Content-Type": "multipart/form-data", // Important for file uploads
           },
         }
       );
@@ -80,154 +71,182 @@ const CreateProduct = () => {
       console.log(error.response?.data?.error || "An error occurred");
     }
   };
-
   return (
-    <motion.div
-      className="bg-gray-800 w-full bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700 mb-8"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-    >
-      <h2 className="text-5xl font-bold text-center mb-10">Create Product</h2>
-
-      <form onSubmit={handleCreateProduct}>
-        <label className="text-2xl font-bold text-blue-gray-600 mb-3 block">
-          Product Name
-        </label>
-        <input
-          maxLength={16}
-          name="name"
-          placeholder="Product Name"
-          className="bg-gray-700 w-[500px] text-white placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-
-        <label className="text-2xl font-bold text-blue-gray-600 mb-3 block">
-          Description
-        </label>
-        <textarea
-          name="description"
-          placeholder="Description"
-          className="bg-gray-700 w-[500px] text-white placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        ></textarea>
-
-        <label className="text-2xl font-bold text-blue-gray-600 mb-3 block">
-          Price
-        </label>
-        <input
-          maxLength={16}
-          name="price"
-          placeholder="Price"
-          className="bg-gray-700 w-[500px] text-white placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-
-        <label className="text-2xl font-bold text-blue-gray-600 mb-3 block">
-          Color
-        </label>
-        <input
-          maxLength={16}
-          name="color"
-          placeholder="Color"
-          className="bg-gray-700 w-[500px] text-white placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-
-        <label className="text-2xl font-bold text-blue-gray-600 mb-3 block">
-          Stock
-        </label>
-        <input
-          maxLength={16}
-          name="stock"
-          placeholder="stock"
-          className="bg-gray-700 w-[500px] text-white placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-
-        <label className="text-2xl font-bold text-blue-gray-600 mb-3 block">
-          Ram
-        </label>
-        <input
-          maxLength={16}
-          name="ram"
-          placeholder="Ram"
-          className="bg-gray-700 w-[500px] text-white placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-
-        <label className="text-2xl font-bold text-blue-gray-600 mb-3 block">
-          Storage
-        </label>
-        <input
-          maxLength={16}
-          name="storage"
-          placeholder="Storage"
-          className="bg-gray-700 w-[500px] text-white placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-
-        <label className="text-2xl font-bold text-blue-gray-600 mb-3 block">
-          Image
-        </label>
-        <input
-          maxLength={16}
-          name="image"
-          type="file"
-          accept="image/*"
-          className="bg-gray-700 w-[500px] text-white placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-
-        <label className="text-2xl font-bold text-blue-gray-600 mb-3 block">
-          Discount
-        </label>
-        <input
-          maxLength={16}
-          name="discountPrice"
-          placeholder="Discount"
-          className="bg-gray-700 w-[500px] text-white placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-
-        <label className="text-2xl font-bold text-blue-gray-600 mb-3 block">
-          Category
-        </label>
-        <select
-          name="category"
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-          className="bg-gray-700 w-[500px] text-white placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          {Array.isArray(allCategory) && allCategory.length > 0 ? (
-            allCategory.map((category, index) => (
-              <option value={category.name} key={index}>
-                {category.name}
-              </option>
-            ))
-          ) : (
-            <option disabled>No categories found</option>
-          )}
-        </select>
-
-        <label className="text-2xl font-bold text-blue-gray-600 mb-3 block">
-          SubCategory
-        </label>
-        <select
-          name="subcategory"
-          value={selectedSubCategory}
-          onChange={(e) => setSelectedSubCategory(e.target.value)}
-          className="bg-gray-700 w-[500px] text-white placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          {Array.isArray(allSubCategory) && allSubCategory.length > 0 ? (
-            allSubCategory.map((subcategory, index) => (
-              <option value={subcategory.name} key={index}>
-                {subcategory.name}
-              </option>
-            ))
-          ) : (
-            <option disabled>No subcategories found</option>
-          )}
-        </select>
-
-        <button
-          type="submit"
-          className="mt-5 px-6 py-3 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600"
-        >
+    <div className="w-full flex items-center justify-center overflow-y-scroll">
+      <motion.div
+        className=" backdrop-blur-md  rounded-xl p-8 w-full max-w-lg"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <h2 className="text-2xl font-bold text-white mb-6 text-center">
           Create Product
-        </button>
-      </form>
-    </motion.div>
+        </h2>
+        <form onSubmit={handleCreateProduct} className="space-y-4">
+          {/* Product Name */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-1">
+              Product Name
+            </label>
+            <input
+              type="text"
+              name="name"
+              className="w-full bg-gray-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter product name"
+            />
+          </div>
+
+          {/* Description */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-1">
+              Description
+            </label>
+            <textarea
+              name="description"
+              className="w-full bg-gray-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter product description"
+              rows="3"
+            />
+          </div>
+
+          {/* Price and Discount */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1">
+                Price
+              </label>
+              <input
+                type="number"
+                name="price"
+                className="w-full bg-gray-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter price"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1">
+                Discount Price
+              </label>
+              <input
+                type="number"
+                name="discount"
+                className="w-full bg-gray-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter discount price"
+              />
+            </div>
+          </div>
+
+          {/* Stock */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-1">
+              Stock
+            </label>
+            <input
+              type="number"
+              name="stock"
+              className="w-full bg-gray-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter stock quantity"
+            />
+          </div>
+
+          {/* RAM and Storage and color */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-1">
+              Ram
+            </label>
+            <input
+              type="number"
+              name="ram"
+              className="w-full bg-gray-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter ram quantity"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-1">
+              Stock
+            </label>
+            <input
+              type="number"
+              name="storage"
+              className="w-full bg-gray-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter storage quantity"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-1">
+              Stock
+            </label>
+            <input
+              type="number"
+              name="color"
+              className="w-full bg-gray-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter storage quantity"
+            />
+          </div>
+
+          {/* Category Dropdown */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-1">
+              Category
+            </label>
+            <select
+              name="category"
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="w-full bg-gray-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option>Select a category</option>
+              {Array.isArray(allCategory) &&
+                allCategory.map((category, index) => (
+                  <option value={category.name} key={index}>
+                    {category.name}
+                  </option>
+                ))}
+            </select>
+          </div>
+
+          {/* SubCategory Dropdown */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-1">
+              SubCategory
+            </label>
+            <select
+              onChange={(e) => setSelectedSubCategory(e.target.value)}
+              name="subCategory"
+              className="w-full bg-gray-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option>Select a subcategory</option>
+              {Array.isArray(allSubCategory) &&
+                allSubCategory.map((Subcategory, index) => (
+                  <option value={Subcategory.name} key={index}>
+                    {Subcategory.name}
+                  </option>
+                ))}
+            </select>
+          </div>
+
+          {/* Image Upload */}
+          {/* <div>
+            <label className="block text-sm font-medium text-gray-300 mb-1">
+              Product Image
+            </label>
+            <input
+              type="file"
+              name="image"
+              accept="image/*"
+              className="w-full bg-gray-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div> */}
+
+          {/* Submit Button */}
+          <div>
+            <button
+              type="submit"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              Create Product
+            </button>
+          </div>
+        </form>
+      </motion.div>
+    </div>
   );
 };
 

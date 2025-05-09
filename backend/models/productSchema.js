@@ -11,16 +11,16 @@ const productSchema = new Schema({
     trim: true,
   },
   price: {
-    type: Number,
-    required: true,
-  },
-  discountPrice: {
-    type: Number,
-    required: true,
-  },
-  productImg: {
     type: String,
+    // required: true,
   },
+  discount: {
+    type: String,
+    // required: true,
+  },
+  // productImg: {
+  //   type: String,
+  // },
   ram: {
     type: String,
   },
@@ -31,18 +31,18 @@ const productSchema = new Schema({
     type: String,
   },
   stock: {
-    type: Number,
-    required: true,
+    type: String,
+    // required: true,
   },
   category: {
     type: Schema.Types.ObjectId,
     ref: "Category",
-    required: true,
+    // required: true,
   },
   subCategory: {
     type: Schema.Types.ObjectId,
     ref: "SubCategory",
-    required: true,
+    // required: true,
   },
 });
 
