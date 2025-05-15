@@ -1,16 +1,17 @@
 const productSchema = require("../models/productSchema");
 const categorySchema = require("../models/categorySchema");
 const subCategorySchema = require("../models/subCategorySchema");
-const { get } = require("mongoose");
 const uploadResult = require("../middleware/cloudinary");
 
 async function createProductController(req, res) {
+  console.log(req.body);
+  
   try {
     const {
       name,
       description,
       price,
-      discountPrice,
+      discount,
       categoryName,
       subCategoryName,
       ram,
@@ -20,31 +21,18 @@ async function createProductController(req, res) {
     } = req.body;
     // const fileName = req.file.path;
     // const imgUrl = await uploadResult(fileName);
-
-    const existingProduct = await productSchema.findOne({ name });
-    if (existingProduct) {
-      return res.status(400).json({
-        message: "Product already exists",
-        status: "Error",
-      });
-    }
     const category = await categorySchema.findOne({ name: categoryName });
     const subCategory = await subCategorySchema.findOne({
       name: subCategoryName,
     });
 
-    if (!category || !subCategory) {
-      return res.status(404).json({
-        message: "Category or SubCategory not found",
-        status: "Error",
-      });
-    }
     const product = new productSchema({
       name,
       description,
       price,
-      discountPrice,
+      discount,
       // productImg: imgUrl.secure_url,
+      image: null,
       category: category._id,
       subCategory: subCategory._id,
       ram,
@@ -52,6 +40,7 @@ async function createProductController(req, res) {
       color,
       stock,
     });
+
     const savedProduct = await product.save();
 
     await categorySchema.findByIdAndUpdate(category._id, {
@@ -110,10 +99,10 @@ async function getSingleProductController(req, res) {
 
 async function updateProductController(req, res) {
   const { id } = req.params;
-  const { name, description, price, discountPrice, productImg, ram, storage, color, stock } = req.body;
+  const { name, description, price, discount, productImg, ram, storage, color, stock } = req.body;
   const updatedProduct = await productSchema.findByIdAndUpdate(
     id,
-    { name, description, price, discountPrice, productImg },
+    { name, description, price, discount, productImg },
     { new: true }
   );
   res.status(200).json({
