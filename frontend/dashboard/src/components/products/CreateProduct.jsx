@@ -15,17 +15,20 @@ const CreateProduct = () => {
     subCategory: "",
     image: "",
   });
-  const handleChange = (e) => {
-    console.log(e.target.files);
-    if (e.target.name == "image") {
-      setForm({ ...form, image: e.target.files[0] });
-    } else {
-      setForm({
-        ...form,
-        [e.target.name]: [e.target.value],
-      });
-    }
-  };
+
+  const [imagePreview, setImagePreview] = useState("");
+
+  // const handleChange = (e) => {
+  //   console.log(e.target.files);
+  //   if (e.target.name == "image") {
+  //     setForm({ ...form, image: e.target.files[0] });
+  //   } else {
+  //     setForm({
+  //       ...form,
+  //       [e.target.name]: [e.target.value],
+  //     });
+  //   }
+  // };
 
   // const handleCreateProduct = async () => {
   //   try {
@@ -59,6 +62,27 @@ const CreateProduct = () => {
   // };
 
   // for options
+
+  const handleChange = (e) => {
+    if (e.target.name === "image") {
+      const file = e.target.files[0];
+      setForm({ ...form, image: file });
+
+      // ছবির প্রিভিউ তৈরি করুন
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      if (file) {
+        reader.readAsDataURL(file);
+      }
+    } else {
+      setForm({
+        ...form,
+        [e.target.name]: e.target.value,
+      });
+    }
+  };
 
   const handleCreateProduct = async () => {
     try {
@@ -106,7 +130,7 @@ const CreateProduct = () => {
   }, []);
   return (
     <motion.div
-      className="bg-gray-800 w-full bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700 mb-8"
+      className="bg-gray-800 h-[100vh] overflow-y-scroll w-full bg-opacity-50 backdrop-blur-md shadow-lg p-6 border border-gray-700 mb-8"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
     >
@@ -127,7 +151,7 @@ const CreateProduct = () => {
               name="name"
               type="text"
               placeholder="Product's Name"
-              className="w-full bg-gray-800 border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-400"
+              className="w-full bg-[#4B5563] border-none border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-400"
             />
           </div>
 
@@ -140,7 +164,7 @@ const CreateProduct = () => {
               value={form.category}
               name="category"
               onChange={(e) => setForm({ ...form, category: e.target.value })}
-              className="w-full bg-gray-800 border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-400"
+              className="w-full bg-[#4B5563] border-none border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-400"
             >
               <option value="">Select Category</option>
               {categories.map((category) => {
@@ -162,7 +186,7 @@ const CreateProduct = () => {
               onChange={handleChange}
               name="description"
               placeholder="Product's Description"
-              className="w-full bg-gray-800 h-24 border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-400"
+              className="w-full bg-[#4B5563] h-24 border-none border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-400"
             ></textarea>
           </div>
 
@@ -177,7 +201,7 @@ const CreateProduct = () => {
               onChange={(e) =>
                 setForm({ ...form, subCategory: e.target.value })
               }
-              className="w-full bg-gray-800 border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-400"
+              className="w-full bg-[#4B5563] border-none border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-400"
             >
               <option value="">Select Subcategory</option>
               {subCategoryies.map((subcategory) => {
@@ -200,7 +224,7 @@ const CreateProduct = () => {
               name="discount"
               type="text"
               placeholder="Product's Discount"
-              className="w-full bg-gray-800 border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-400"
+              className="w-full bg-[#4B5563] border-none border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-400"
             />
           </div>
 
@@ -212,7 +236,7 @@ const CreateProduct = () => {
               name="ram"
               type="text"
               placeholder="Product's ram"
-              className="w-full bg-gray-800 border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-400"
+              className="w-full bg-[#4B5563] border-none border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-400"
             />
           </div>
 
@@ -226,7 +250,7 @@ const CreateProduct = () => {
               name="storage"
               type="text"
               placeholder="Product's Discount"
-              className="w-full bg-gray-800 border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-400"
+              className="w-full bg-[#4B5563] border-none border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-400"
             />
           </div>
 
@@ -238,13 +262,32 @@ const CreateProduct = () => {
               name="stock"
               type="text"
               placeholder="Product's Discount"
-              className="w-full bg-gray-800 border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-400"
+              className="w-full bg-[#4B5563] border-none border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-400"
             />
           </div>
 
           {/* Product Image */}
           <div>
             <label className="block font-semibold mb-1">Product's Image</label>
+            {imagePreview && (
+              <div className="relative my-5 w-[150px] h-[150px]">
+                <img
+                  src={imagePreview}
+                  alt="Preview"
+                  className="w-full h-full object-cover rounded-lg"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setImagePreview(null); // Clear the preview
+                    setForm({ ...form, image: "" }); // Clear the image in the form
+                  }}
+                  className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
             <label
               htmlFor="image"
               className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-600 rounded-lg cursor-pointer bg-gray-700 hover:bg-gray-600"
@@ -265,9 +308,12 @@ const CreateProduct = () => {
                   ></path>
                 </svg>
                 <p className="mb-2 text-sm text-gray-400">
-                  <span className="font-semibold">Click to upload</span> or drag and drop
+                  <span className="font-semibold">Click to upload</span> or drag
+                  and drop
                 </p>
-                <p className="text-xs text-gray-400">PNG, JPG, GIF up to 10MB</p>
+                <p className="text-xs text-gray-400">
+                  PNG, JPG, GIF up to 10MB
+                </p>
               </div>
               <input
                 id="image"
@@ -279,7 +325,9 @@ const CreateProduct = () => {
             </label>
             {form.image && (
               <div className="mt-2">
-                <p className="text-sm text-gray-400">Selected File: {form.image.name}</p>
+                <p className="text-sm text-gray-400">
+                  Selected File: {form.image.name}
+                </p>
               </div>
             )}
           </div>
@@ -294,7 +342,7 @@ const CreateProduct = () => {
               name="price"
               type="text"
               placeholder="Product's Price"
-              className="w-full bg-gray-800 border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-400"
+              className="w-full bg-[#4B5563] border-none border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-400"
             />
           </div>
         </form>
@@ -303,7 +351,7 @@ const CreateProduct = () => {
         <div onClick={handleCreateProduct} className="mt-8">
           <button
             type="submit"
-            className="w-full md:w-auto bg-gray-800 text-white px-6 py-3 rounded-md transition duration-300 cursor-pointer"
+            className="w-full md:w-auto border-none bg-[#4B5563] text-white px-6 py-3 rounded-md transition duration-300 cursor-pointer"
           >
             CREATE PRODUCT
           </button>
