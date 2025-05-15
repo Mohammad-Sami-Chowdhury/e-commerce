@@ -12,14 +12,14 @@ const productSchema = new Schema({
     trim: true,
   },
   price: {
-    type: Number, // Changed from String to Number
+    type: Number,
     required: true,
   },
   discount: {
-    type: Number, // Changed from String to Number
+    type: Number,
     default: 0,
   },
-  image: { // Renamed from productImg to match frontend's field
+  image: {
     type: String,
     default: "placeholder.jpg",
   },
@@ -30,7 +30,7 @@ const productSchema = new Schema({
     type: String,
   },
   stock: {
-    type: Number, // Changed from String to Number
+    type: Number,
     required: true,
   },
   category: {
