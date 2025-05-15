@@ -1,48 +1,46 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
-
 const productSchema = new Schema({
   name: {
     type: String,
-    // trim: true,
+    required: true,
+    trim: true,
   },
   description: {
     type: String,
-    // trim: true,
+    required: true,
+    trim: true,
   },
   price: {
-    type: String,
-    // required: true,
+    type: Number, // Changed from String to Number
+    required: true,
   },
   discount: {
-    type: String,
-    // required: true,
+    type: Number, // Changed from String to Number
+    default: 0,
   },
-  // productImg: {
-  //   type: String,
-  // },
+  image: { // Renamed from productImg to match frontend's field
+    type: String,
+    default: "placeholder.jpg",
+  },
   ram: {
     type: String,
   },
   storage: {
     type: String,
   },
-  color: {
-    type: String,
-  },
   stock: {
-    type: String,
-    // required: true,
+    type: Number, // Changed from String to Number
+    required: true,
   },
   category: {
     type: Schema.Types.ObjectId,
     ref: "Category",
-    // required: true,
+    required: true,
   },
   subCategory: {
     type: Schema.Types.ObjectId,
     ref: "SubCategory",
-    // required: true,
   },
 });
 

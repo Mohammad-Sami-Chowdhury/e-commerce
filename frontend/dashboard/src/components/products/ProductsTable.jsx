@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Edit, Search, Trash2, Plus } from "lucide-react";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 const ProductsTable = () => {
   // State
@@ -266,13 +267,13 @@ const ProductsTable = () => {
               </button>
             )}
 
-            <button
-              // onClick={() => setShowAddModal(true)}
+            <Link
+              to="/create-product"
               className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg md:rounded-full md:px-4 md:flex md:items-center md:gap-2"
             >
               <Plus size={18} />
               <span className="hidden md:inline">Add Product</span>
-            </button>
+            </Link>
           </div>
         </div>
 
@@ -307,30 +308,30 @@ const ProductsTable = () => {
                   transition={{ duration: 0.3 }}
                 >
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100 flex gap-2 items-center">
-                    {renderProductImage(product.productImg)}
+                    {renderProductImage(product.image)}
                     <div>
-                      <div>{product.name}</div>
+                      <div>{product.name || "No Name"}</div>
                       <div className="text-gray-400 text-xs">
-                        {typeof product.category === "object"
+                        {product.category && typeof product.category === "object"
                           ? product.category.name
-                          : product.category}
+                          : product.category || "No Category"}
                         {product.subCategory &&
                           ` / ${
                             typeof product.subCategory === "object"
                               ? product.subCategory.name
-                              : product.subCategory
+                              : product.subCategory || "No Subcategory"
                           }`}
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                    ${product.price?.toFixed(2)}
+                    ${product.price?.toFixed(2) || "0.00"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                    ${product.discountPrice?.toFixed(2)}
+                    ${product.discountPrice?.toFixed(2) || "0.00"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                    {product.stock}
+                    {product.stock || "0"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                     <button

@@ -2,70 +2,73 @@ const productSchema = require("../models/productSchema");
 const categorySchema = require("../models/categorySchema");
 const subCategorySchema = require("../models/subCategorySchema");
 const uploadResult = require("../middleware/cloudinary");
-
-async function createProductController(req, res) {
-  console.log(req.body);
-  
+const createProductController = async (req, res) => {
   try {
+    // Access form data from req.body and req.file
     const {
       name,
       description,
       price,
       discount,
-      categoryName,
-      subCategoryName,
+      stock,
       ram,
       storage,
-      color,
-      stock,
+      category,
+      subCategory,
     } = req.body;
-    // const fileName = req.file.path;
-    // const imgUrl = await uploadResult(fileName);
-    const category = await categorySchema.findOne({ name: categoryName });
-    const subCategory = await subCategorySchema.findOne({
-      name: subCategoryName,
-    });
 
+
+    const fileName = req.file.path;
+    const imgUrl = await uploadResult(fileName);
+
+    // Validate required fields
+    if (!name || !description || !price || !category) {
+      return res.status(400).json({
+        message: "Missing required fields (name, description, price, category)",
+        status: "Error",
+      });
+    }
+
+    // Create the product
     const product = new productSchema({
       name,
       description,
-      price,
-      discount,
-      // productImg: imgUrl.secure_url,
-      image: null,
-      category: category._id,
-      subCategory: subCategory._id,
+      price: Number(price),
+      discount: Number(discount),
+      stock: Number(stock),
       ram,
       storage,
-      color,
-      stock,
+      category, // Ensure this is a valid category ID
+      subCategory: subCategory || null,
+      image: imgUrl.secure_url || null, // Use the URL from Cloudinary or local path
     });
 
     const savedProduct = await product.save();
 
-    await categorySchema.findByIdAndUpdate(category._id, {
+    // Update category and subcategory
+    await categorySchema.findByIdAndUpdate(category, {
       $push: { products: savedProduct._id },
     });
-    await subCategorySchema.findByIdAndUpdate(subCategory._id, {
-      $push: { products: savedProduct._id },
-    });
+
+    if (subCategory) {
+      await subCategorySchema.findByIdAndUpdate(subCategory, {
+        $push: { products: savedProduct._id },
+      });
+    }
+
     res.status(201).json({
-      message: "Product created and linked successfully",
+      message: "Product created!",
       status: "Success",
-      data: {
-        product: savedProduct,
-        category: category.name,
-        subCategory: subCategory.name,
-      },
+      data: savedProduct,
     });
   } catch (error) {
     res.status(500).json({
-      message: "Internal server error",
+      message: "Server error",
       status: "Error",
       error: error.message,
     });
   }
-}
+};
 
 async function getAllProductController(req, res) {
   try {

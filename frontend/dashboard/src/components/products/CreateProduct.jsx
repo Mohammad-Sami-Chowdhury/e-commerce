@@ -11,57 +11,86 @@ const CreateProduct = () => {
     stock: "",
     ram: "",
     storage: "",
-    color: "",
     category: "",
     subCategory: "",
-    image: null,
+    image: "",
   });
   const handleChange = (e) => {
     console.log(e.target.files);
-    // if (e.target.name == "image") {
-    //   setForm({ ...form, image: e.target.files[0] });
-    // } else {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
-    // }
+    if (e.target.name == "image") {
+      setForm({ ...form, image: e.target.files[0] });
+    } else {
+      setForm({
+        ...form,
+        [e.target.name]: [e.target.value],
+      });
+    }
   };
 
+  // const handleCreateProduct = async () => {
+  //   try {
+  //     const formData = new FormData();
+  //     Object.entries(form).forEach(([key, value]) => {
+  //       console.log(key, value);
+  //       console.log(formData, "dbvdbdgv");
+
+  //       if (key == "image") {
+  //         formData.append("image", value);
+  //       } else {
+  //         formData.append(key, value);
+  //       }
+  //     });
+  //     console.log(form, "this is form");
+  //     console.log(formData, "this is formData");
+
+  //     const response = await axios.post(
+  //       "http://localhost:5000/api/v1/product/createproduct",
+  //       form,
+  //       {
+  //         headers: {
+  //           "Content-Type": "multipart/form-data",
+  //         },
+  //       }
+  //     );
+  //     console.log(response, "this is response");
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+
+  // for options
+
   const handleCreateProduct = async () => {
-    console.log(form);
     try {
       const formData = new FormData();
-      Object.entries(form).forEach(([key, value]) => {
-        console.log(key, value);
-        console.log(formData);
-
-        // if (key == "image") {
-        //   formData.append("image", value);
-        // } else {
-        formData.append(key, value);
-        // }
-      });
-      console.log(form);
-      console.log(formData);
+      formData.append("name", form.name);
+      formData.append("description", form.description);
+      formData.append("price", form.price.toString()); // Convert to string if needed
+      formData.append("discount", form.discount.toString());
+      formData.append("stock", form.stock.toString());
+      formData.append("ram", form.ram);
+      formData.append("storage", form.storage);
+      formData.append("category", form.category); // Send category ID
+      formData.append("subCategory", form.subCategory || ""); // Optional
+      if (form.image) {
+        formData.append("image", form.image); // Append the File object
+      }
 
       const response = await axios.post(
         "http://localhost:5000/api/v1/product/createproduct",
         formData,
-        form
-        // {
-        //   headers: {
-        //     "Content-Type": "multipart/form-data",
-        //   },
-        // }
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
       );
-      console.log(response);
+      console.log(response.data);
     } catch (error) {
-      console.log(error);
+      console.error("Error:", error.response?.data || error.message);
     }
   };
 
-  // for options
   const [categories, setCategories] = useState([]);
   const [subCategoryies, setSubCategoryies] = useState([]);
   useEffect(() => {
@@ -77,7 +106,7 @@ const CreateProduct = () => {
   }, []);
   return (
     <motion.div
-      className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700 mb-8"
+      className="bg-gray-800 w-full bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700 mb-8"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
     >
@@ -98,7 +127,7 @@ const CreateProduct = () => {
               name="name"
               type="text"
               placeholder="Product's Name"
-              className="w-full bg-black border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-400"
+              className="w-full bg-gray-800 border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-400"
             />
           </div>
 
@@ -111,13 +140,12 @@ const CreateProduct = () => {
               value={form.category}
               name="category"
               onChange={(e) => setForm({ ...form, category: e.target.value })}
-              className="w-full bg-black border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-400"
+              className="w-full bg-gray-800 border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-400"
             >
               <option value="">Select Category</option>
               {categories.map((category) => {
-                console.log("Subcategory Name:", category); // Log the subcategory name
                 return (
-                  <option key={category.name} value={category.name}>
+                  <option key={category._id} value={category._id}>
                     {category.name}
                   </option>
                 );
@@ -134,7 +162,7 @@ const CreateProduct = () => {
               onChange={handleChange}
               name="description"
               placeholder="Product's Description"
-              className="w-full bg-black h-24 border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-400"
+              className="w-full bg-gray-800 h-24 border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-400"
             ></textarea>
           </div>
 
@@ -149,13 +177,12 @@ const CreateProduct = () => {
               onChange={(e) =>
                 setForm({ ...form, subCategory: e.target.value })
               }
-              className="w-full bg-black border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-400"
+              className="w-full bg-gray-800 border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-400"
             >
               <option value="">Select Subcategory</option>
               {subCategoryies.map((subcategory) => {
-                console.log("Subcategory Name:", subcategory.name); // Log the subcategory name
                 return (
-                  <option key={subcategory.name} value={subcategory.name}>
+                  <option key={subcategory._id} value={subcategory._id}>
                     {subcategory.name}
                   </option>
                 );
@@ -173,7 +200,7 @@ const CreateProduct = () => {
               name="discount"
               type="text"
               placeholder="Product's Discount"
-              className="w-full bg-black border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-400"
+              className="w-full bg-gray-800 border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-400"
             />
           </div>
 
@@ -185,7 +212,7 @@ const CreateProduct = () => {
               name="ram"
               type="text"
               placeholder="Product's ram"
-              className="w-full bg-black border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-400"
+              className="w-full bg-gray-800 border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-400"
             />
           </div>
 
@@ -199,7 +226,7 @@ const CreateProduct = () => {
               name="storage"
               type="text"
               placeholder="Product's Discount"
-              className="w-full bg-black border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-400"
+              className="w-full bg-gray-800 border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-400"
             />
           </div>
 
@@ -211,19 +238,50 @@ const CreateProduct = () => {
               name="stock"
               type="text"
               placeholder="Product's Discount"
-              className="w-full bg-black border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-400"
+              className="w-full bg-gray-800 border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-400"
             />
           </div>
 
           {/* Product Image */}
           <div>
             <label className="block font-semibold mb-1">Product's Image</label>
-            <input
-              onChange={handleChange}
-              type="file"
-              name="image"
-              className="w-full bg-black border border-gray-300 px-3 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-400"
-            />
+            <label
+              htmlFor="image"
+              className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-600 rounded-lg cursor-pointer bg-gray-700 hover:bg-gray-600"
+            >
+              <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                <svg
+                  className="w-8 h-8 mb-3 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M7 16l-4-4m0 0l4-4m-4 4h18M3 12h18"
+                  ></path>
+                </svg>
+                <p className="mb-2 text-sm text-gray-400">
+                  <span className="font-semibold">Click to upload</span> or drag and drop
+                </p>
+                <p className="text-xs text-gray-400">PNG, JPG, GIF up to 10MB</p>
+              </div>
+              <input
+                id="image"
+                type="file"
+                name="image"
+                onChange={handleChange}
+                className="hidden"
+              />
+            </label>
+            {form.image && (
+              <div className="mt-2">
+                <p className="text-sm text-gray-400">Selected File: {form.image.name}</p>
+              </div>
+            )}
           </div>
 
           {/* Product Price */}
@@ -236,18 +294,7 @@ const CreateProduct = () => {
               name="price"
               type="text"
               placeholder="Product's Price"
-              className="w-full bg-black border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-400"
-            />
-          </div>
-          {/* Product Discount */}
-          <div>
-            <label className="block font-semibold mb-1">Product's Color</label>
-            <input
-              onChange={handleChange}
-              name="color"
-              type="text"
-              placeholder="Product's color"
-              className="w-full border bg-black border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-400"
+              className="w-full bg-gray-800 border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-400"
             />
           </div>
         </form>
@@ -256,7 +303,7 @@ const CreateProduct = () => {
         <div onClick={handleCreateProduct} className="mt-8">
           <button
             type="submit"
-            className="w-full md:w-auto bg-black text-white px-6 py-3 rounded-md hover:bg-gray-800 transition duration-300 cursor-pointer"
+            className="w-full md:w-auto bg-gray-800 text-white px-6 py-3 rounded-md transition duration-300 cursor-pointer"
           >
             CREATE PRODUCT
           </button>
