@@ -19,13 +19,14 @@ const Login = () => {
     setError("");
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:5000/api/v1/auth/login", form, {
-        withCredentials: true,
-      });
+      const res = await axios.post(
+        "http://localhost:5000/api/v1/authentication/login",
+        form,
+        {}
+      );
       if (res.data.error) {
         setError(res.data.error);
       } else {
-        // You can store user info/token here if needed
         navigate("/");
       }
     } catch (err) {
