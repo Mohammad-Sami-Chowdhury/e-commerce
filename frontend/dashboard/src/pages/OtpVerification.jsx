@@ -1,12 +1,16 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const OtpVerification = () => {
   const [otp, setOtp] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [resendMessage, setResendMessage] = useState("");
+  const [resendLoading, setResendLoading] = useState(false);
+  const navigate = useNavigate();
 
   // Get email from localStorage (set this after registration)
   const email = localStorage.getItem("pendingEmail") || "";
@@ -33,11 +37,32 @@ const OtpVerification = () => {
         setError(res.data.error);
       } else {
         setMessage(res.data.message || "OTP verified successfully!");
+        localStorage.removeItem("pendingEmail");
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
       }
     } catch (err) {
       setError(err.response?.data?.error || "OTP verification failed");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    setResendMessage("");
+    setError("");
+    setResendLoading(true);
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/v1/authentication/otp-reset",
+        { email }
+      );
+      setResendMessage(res.data.message || "OTP resent!");
+    } catch (err) {
+      setError(err.response?.data?.error || "Could not resend OTP");
+    } finally {
+      setResendLoading(false);
     }
   };
 
@@ -84,6 +109,17 @@ const OtpVerification = () => {
           className="mt-8 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-md transition duration-300 shadow-lg disabled:opacity-50"
         >
           {loading ? "Verifying..." : "Verify OTP"}
+        </button>
+        {resendMessage && (
+          <div className="mb-2 text-green-400 text-center">{resendMessage}</div>
+        )}
+        <button
+          type="button"
+          onClick={handleResendOtp}
+          disabled={resendLoading}
+          className="mt-4 w-full bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 rounded-md transition duration-300 shadow disabled:opacity-50"
+        >
+          {resendLoading ? "Resending..." : "Resend OTP"}
         </button>
       </form>
     </motion.div>

@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Registration = () => {
   const [form, setForm] = useState({
@@ -13,6 +14,7 @@ const Registration = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -43,6 +45,9 @@ const Registration = () => {
       } else {
         setMessage(res.data.message || "Registration successful!");
         localStorage.setItem("pendingEmail", form.email);
+        setTimeout(() => {
+          navigate("/otpverification");
+        }, 2000);
       }
     } catch (err) {
       setError(err.response?.data?.error || "Registration failed");

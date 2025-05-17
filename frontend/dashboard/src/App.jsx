@@ -13,6 +13,7 @@ import SettingsPage from "./pages/SettingsPage";
 import CreateProduct from "./components/products/createProduct";
 import Registration from "./pages/Registration";
 import OtpVerification from "./pages/OtpVerification";
+import Login from "./pages/Login";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         {/* Registration route WITHOUT sidebar */}
         <Route path="/registration" element={<Registration />} />
         <Route path="/otpverification" element={<OtpVerification />} />
+        <Route path="/login" element={<Login />} />
 
         {/* All other routes WITH sidebar */}
         <Route
