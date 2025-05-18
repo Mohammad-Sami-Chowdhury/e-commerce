@@ -27,7 +27,9 @@ const Login = () => {
       if (res.data.error) {
         setError(res.data.error);
       } else {
-        navigate("/");
+        setTimeout(() => {
+          navigate("/");
+        }, 2000);
       }
     } catch (err) {
       setError(err.response?.data?.error || "Login failed");

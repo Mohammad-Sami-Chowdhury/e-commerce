@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
 import axios from "axios";
 import { useState, useEffect } from "react";
+import toast, { Toaster } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const CreateProduct = () => {
   const [form, setForm] = useState({
@@ -17,58 +19,13 @@ const CreateProduct = () => {
   });
 
   const [imagePreview, setImagePreview] = useState("");
-
-  // const handleChange = (e) => {
-  //   console.log(e.target.files);
-  //   if (e.target.name == "image") {
-  //     setForm({ ...form, image: e.target.files[0] });
-  //   } else {
-  //     setForm({
-  //       ...form,
-  //       [e.target.name]: [e.target.value],
-  //     });
-  //   }
-  // };
-
-  // const handleCreateProduct = async () => {
-  //   try {
-  //     const formData = new FormData();
-  //     Object.entries(form).forEach(([key, value]) => {
-  //       console.log(key, value);
-  //       console.log(formData, "dbvdbdgv");
-
-  //       if (key == "image") {
-  //         formData.append("image", value);
-  //       } else {
-  //         formData.append(key, value);
-  //       }
-  //     });
-  //     console.log(form, "this is form");
-  //     console.log(formData, "this is formData");
-
-  //     const response = await axios.post(
-  //       "http://localhost:5000/api/v1/product/createproduct",
-  //       form,
-  //       {
-  //         headers: {
-  //           "Content-Type": "multipart/form-data",
-  //         },
-  //       }
-  //     );
-  //     console.log(response, "this is response");
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
-
-  // for options
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     if (e.target.name === "image") {
       const file = e.target.files[0];
       setForm({ ...form, image: file });
 
-      // ছবির প্রিভিউ তৈরি করুন
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
@@ -84,7 +41,8 @@ const CreateProduct = () => {
     }
   };
 
-  const handleCreateProduct = async () => {
+  const handleCreateProduct = async (e) => {
+    e.preventDefault();
     try {
       const formData = new FormData();
       formData.append("name", form.name);
@@ -99,7 +57,6 @@ const CreateProduct = () => {
       if (form.image) {
         formData.append("image", form.image); // Append the File object
       }
-
       const response = await axios.post(
         "http://localhost:5000/api/v1/product/createproduct",
         formData,
@@ -109,9 +66,10 @@ const CreateProduct = () => {
           },
         }
       );
-      console.log(response.data);
+      toast.success(response.data);
+      navigate("/products");
     } catch (error) {
-      console.error("Error:", error.response?.data || error.message);
+      toast.error("Error:", error.response?.data || error.message);
     }
   };
 
@@ -134,13 +92,17 @@ const CreateProduct = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
     >
+      <Toaster />
       <div className="max-w-5xl mx-auto px-4 py-8">
         <h2 className="text-2xl md:text-3xl font-bold mb-2">Create Product</h2>
         <p className="text-gray-500 mb-6">
           Nice to meet you! Enter your details to register.
         </p>
 
-        <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <form
+          onSubmit={handleCreateProduct}
+          className="grid grid-cols-1 md:grid-cols-2 gap-6"
+        >
           {/* Product Name */}
           <div>
             <label className="block font-semibold mb-1">
@@ -345,17 +307,14 @@ const CreateProduct = () => {
               className="w-full bg-[#4B5563] border-none border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-400"
             />
           </div>
-        </form>
 
-        {/* Submit Button */}
-        <div onClick={handleCreateProduct} className="mt-8">
           <button
             type="submit"
-            className="w-full md:w-auto border-none bg-[#4B5563] text-white px-6 py-3 rounded-md transition duration-300 cursor-pointer"
+            className="w-full md:w-auto border-none mt-8 bg-[#4B5563] text-white px-6 py-3 rounded-md transition duration-300 cursor-pointer"
           >
             CREATE PRODUCT
           </button>
-        </div>
+        </form>
       </div>
     </motion.div>
   );

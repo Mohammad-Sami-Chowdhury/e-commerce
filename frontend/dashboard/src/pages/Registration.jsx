@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import toast, { Toaster } from "react-hot-toast";
 
 const Registration = () => {
   const [form, setForm] = useState({
@@ -12,8 +13,6 @@ const Registration = () => {
     confirmPassword: "",
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -22,11 +21,9 @@ const Registration = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage("");
-    setError("");
 
     if (form.password !== form.confirmPassword) {
-      setError("Passwords do not match");
+      toast.error("Passwords do not match");
       return;
     }
 
@@ -41,16 +38,16 @@ const Registration = () => {
         }
       );
       if (res.data.error) {
-        setError(res.data.error);
+        toast.error(res.data.error);
       } else {
-        setMessage(res.data.message || "Registration successful!");
+        toast.success(res.data.message || "Registration successful!");
         localStorage.setItem("pendingEmail", form.email);
         setTimeout(() => {
           navigate("/otpverification");
         }, 2000);
       }
     } catch (err) {
-      setError(err.response?.data?.error || "Registration failed");
+      toast.error(err.response?.data?.error || "Registration failed");
     }
   };
 
@@ -60,6 +57,7 @@ const Registration = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
     >
+      <Toaster />
       <form
         onSubmit={handleSubmit}
         className="bg-gray-800 bg-opacity-90 backdrop-blur-md shadow-2xl rounded-2xl p-10 w-full max-w-md border border-gray-700"
@@ -67,10 +65,6 @@ const Registration = () => {
         <h2 className="text-3xl font-bold text-center text-white mb-8">
           Create Your Account
         </h2>
-        {error && <div className="mb-4 text-red-400 text-center">{error}</div>}
-        {message && (
-          <div className="mb-4 text-green-400 text-center">{message}</div>
-        )}
         <div className="space-y-5">
           <div>
             <label className="block text-gray-300 font-semibold mb-1">

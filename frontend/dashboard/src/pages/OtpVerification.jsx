@@ -2,18 +2,17 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import toast, { Toaster } from "react-hot-toast";
 
 const OtpVerification = () => {
   const [otp, setOtp] = useState("");
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [resendMessage, setResendMessage] = useState("");
   const [resendLoading, setResendLoading] = useState(false);
   const navigate = useNavigate();
 
   // Get email from localStorage (set this after registration)
-  const email = localStorage.getItem("pendingEmail") || "";
+  const email = localStorage.getItem("pendingEmail");
 
   const handleChange = (e) => {
     setOtp(e.target.value.replace(/\D/, ""));
@@ -21,8 +20,6 @@ const OtpVerification = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage("");
-    setError("");
     setLoading(true);
 
     try {
@@ -34,16 +31,17 @@ const OtpVerification = () => {
         }
       );
       if (res.data.error) {
-        setError(res.data.error);
+        toast.error(res.data.error);
       } else {
-        setMessage(res.data.message || "OTP verified successfully!");
+        toast.success("OTP verified successfully!");
         localStorage.removeItem("pendingEmail");
         setTimeout(() => {
           navigate("/login");
         }, 2000);
       }
     } catch (err) {
-      setError(err.response?.data?.error || "OTP verification failed");
+      toast.error(err.response?.data?.error || "OTP verification failed");
+      toast.error(err.response?.data?.error || "OTP verification failed");
     } finally {
       setLoading(false);
     }
@@ -51,7 +49,6 @@ const OtpVerification = () => {
 
   const handleResendOtp = async () => {
     setResendMessage("");
-    setError("");
     setResendLoading(true);
     try {
       const res = await axios.post(
@@ -59,8 +56,10 @@ const OtpVerification = () => {
         { email }
       );
       setResendMessage(res.data.message || "OTP resent!");
+      toast.success(res.data.message || "OTP resent!");
     } catch (err) {
-      setError(err.response?.data?.error || "Could not resend OTP");
+      toast.error(err.response?.data?.error || "Could not resend OTP");
+      toast.error(err.response?.data?.error || "Could not resend OTP");
     } finally {
       setResendLoading(false);
     }
@@ -72,6 +71,7 @@ const OtpVerification = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
     >
+      <Toaster />
       <form
         onSubmit={handleSubmit}
         className="bg-gray-800 bg-opacity-90 backdrop-blur-md shadow-2xl rounded-2xl p-10 w-full max-w-md border border-gray-700"
@@ -79,10 +79,6 @@ const OtpVerification = () => {
         <h2 className="text-3xl font-bold text-center text-white mb-8">
           OTP Verification
         </h2>
-        {error && <div className="mb-4 text-red-400 text-center">{error}</div>}
-        {message && (
-          <div className="mb-4 text-green-400 text-center">{message}</div>
-        )}
         <div className="space-y-5">
           <div>
             <label className="block text-gray-300 font-semibold mb-1">

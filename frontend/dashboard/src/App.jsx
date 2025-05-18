@@ -17,14 +17,10 @@ import Login from "./pages/Login";
 
 function App() {
   return (
-    <>
       <Routes>
-        {/* Registration route WITHOUT sidebar */}
         <Route path="/registration" element={<Registration />} />
         <Route path="/otpverification" element={<OtpVerification />} />
         <Route path="/login" element={<Login />} />
-
-        {/* All other routes WITH sidebar */}
         <Route
           path="*"
           element={
@@ -50,7 +46,6 @@ function App() {
           }
         />
       </Routes>
-    </>
   );
 }
 
