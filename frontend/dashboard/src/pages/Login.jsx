@@ -22,11 +22,15 @@ const Login = () => {
       const res = await axios.post(
         "http://localhost:5000/api/v1/authentication/login",
         form,
-        {}
+        {
+          withCredentials: true,
+        }
       );
       if (res.data.error) {
         setError(res.data.error);
       } else {
+        console.log(res.data);
+        localStorage.setItem("authToken", res.data.token);
         setTimeout(() => {
           navigate("/");
         }, 2000);

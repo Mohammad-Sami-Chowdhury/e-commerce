@@ -1,11 +1,12 @@
 const bcrypt = require("bcrypt");
 const userSchema = require("../models/userSchema");
+const jwt = require("jsonwebtoken");
 
 async function loginController(req, res) {
   try {
     const { email, password } = req.body;
-
     const user = await userSchema.findOne({ email });
+    const token = jwt.sign(user.toObject(), process.env.JWT_SECRET);
     if (!user) {
       return res.status(400).json({ error: "User is not found" });
     }
@@ -31,6 +32,7 @@ async function loginController(req, res) {
     res.json({
       message: "Login Successful!",
       status: "Success",
+      token: token,
     });
   } catch (error) {
     console.error("Error during login:", error);

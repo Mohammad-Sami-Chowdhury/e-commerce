@@ -14,16 +14,18 @@ import CreateProduct from "./components/products/createProduct";
 import Registration from "./pages/Registration";
 import OtpVerification from "./pages/OtpVerification";
 import Login from "./pages/Login";
+import PrivateRoute from "./PrivateRoute";
 
 function App() {
   return (
-      <Routes>
-        <Route path="/registration" element={<Registration />} />
-        <Route path="/otpverification" element={<OtpVerification />} />
-        <Route path="/login" element={<Login />} />
-        <Route
-          path="*"
-          element={
+    <Routes>
+      <Route path="/registration" element={<Registration />} />
+      <Route path="/otpverification" element={<OtpVerification />} />
+      <Route path="/login" element={<Login />} />
+      <Route
+        path="*"
+        element={
+          <PrivateRoute>
             <div className="flex h-screen bg-gray-900 text-gray-100 overflow-hidden">
               {/* BG */}
               <div className="fixed inset-0 z-0">
@@ -43,9 +45,10 @@ function App() {
                 <Route path="/settings" element={<SettingsPage />} />
               </Routes>
             </div>
-          }
-        />
-      </Routes>
+          </PrivateRoute>
+        }
+      />
+    </Routes>
   );
 }
 

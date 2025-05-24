@@ -1,6 +1,6 @@
 require("dotenv").config();
 const express = require("express");
-var cors = require('cors')
+var cors = require("cors");
 const database = require("./database/database");
 const route = require("./route");
 const session = require("express-session");
@@ -10,11 +10,16 @@ const app = express();
 const port = 5000;
 database();
 app.use(express.json());
-app.use(cors())
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 const store = new MongoDBStore({
   uri: process.env.DATABASE_URL,
   collection: "mySessions",
-})
+});
 app.use(
   session({
     secret: "e-commerce",
